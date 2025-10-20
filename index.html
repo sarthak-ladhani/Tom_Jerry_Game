@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tom & Jerry - Whack-A-Mole</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>🐱 Tom & Jerry Whack-A-Mole 🐭</h1>
+        </header>
+
+        <div class="game-info">
+            <div class="info-box">
+                <span class="label">Score:</span>
+                <span id="score" class="value">0</span>
+            </div>
+            <div class="info-box">
+                <span class="label">Time:</span>
+                <span id="timer" class="value">90</span>
+            </div>
+            <div class="info-box">
+                <span class="label">High Score:</span>
+                <span id="highScore" class="value">0</span>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            <div id="gameMessage" class="game-message hidden"></div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">Start Game</button>
+            <button id="restartBtn" class="btn btn-secondary hidden">Play Again</button>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play:</h3>
+            <ul>
+                <li>🐭 Jerry will pop up from random holes</li>
+                <li>🔨 Click on Jerry to whack him and score points</li>
+                <li>⏱️ You have 90 seconds to get the highest score</li>
+                <li>📈 Jerry gets faster as you progress!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
