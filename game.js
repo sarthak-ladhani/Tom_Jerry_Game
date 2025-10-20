@@ -286,18 +286,39 @@ function initHoles() {
     }
 }
 
-// Load leaderboard from localStorage
+// Load leaderboard from Firebase
 function loadLeaderboard() {
-    const saved = localStorage.getItem('tomJerryLeaderboard');
-    gameState.leaderboard = saved ? JSON.parse(saved) : [];
+    // Show loading state
+    if (leaderboardList) {
+        leaderboardList.innerHTML = '<div class="leaderboard-empty">Loading leaderboard...</div>';
+    }
+
+    // Listen for real-time updates from Firebase
+    leaderboardRef.orderByChild('score').limitToLast(100).on('value', (snapshot) => {
+        gameState.leaderboard = [];
+
+        snapshot.forEach((childSnapshot) => {
+            gameState.leaderboard.push({
+                id: childSnapshot.key,
+                ...childSnapshot.val()
+            });
+        });
+
+        // Sort by score (descending) and keep only top 10
+        gameState.leaderboard.sort((a, b) => b.score - a.score);
+        gameState.leaderboard = gameState.leaderboard.slice(0, 10);
+
+        // Update display if leaderboard modal is open
+        if (!leaderboardModal.classList.contains('hidden')) {
+            displayLeaderboard();
+        }
+    }, (error) => {
+        console.error('Error loading leaderboard:', error);
+        gameState.leaderboard = [];
+    });
 }
 
-// Save leaderboard to localStorage
-function saveLeaderboard() {
-    localStorage.setItem('tomJerryLeaderboard', JSON.stringify(gameState.leaderboard));
-}
-
-// Add score to leaderboard
+// Add score to Firebase leaderboard
 function addToLeaderboard(name, score) {
     const entry = {
         name: name,
@@ -306,13 +327,42 @@ function addToLeaderboard(name, score) {
         timestamp: Date.now()
     };
 
-    gameState.leaderboard.push(entry);
+    // Push to Firebase (it will auto-generate a unique ID)
+    leaderboardRef.push(entry, (error) => {
+        if (error) {
+            console.error('Error adding score to leaderboard:', error);
+            alert('Failed to save score to leaderboard. Please check your internet connection.');
+        } else {
+            console.log('Score saved successfully!');
 
-    // Sort by score (descending) and keep only top 10
-    gameState.leaderboard.sort((a, b) => b.score - a.score);
-    gameState.leaderboard = gameState.leaderboard.slice(0, 10);
+            // Clean up old entries (keep only top 100)
+            cleanupLeaderboard();
+        }
+    });
+}
 
-    saveLeaderboard();
+// Clean up leaderboard to keep only top 100 scores
+function cleanupLeaderboard() {
+    leaderboardRef.orderByChild('score').once('value', (snapshot) => {
+        const entries = [];
+        snapshot.forEach((childSnapshot) => {
+            entries.push({
+                id: childSnapshot.key,
+                score: childSnapshot.val().score
+            });
+        });
+
+        // Sort by score descending
+        entries.sort((a, b) => b.score - a.score);
+
+        // Delete entries beyond top 100
+        if (entries.length > 100) {
+            const toDelete = entries.slice(100);
+            toDelete.forEach((entry) => {
+                leaderboardRef.child(entry.id).remove();
+            });
+        }
+    });
 }
 
 // Display leaderboard
@@ -345,12 +395,21 @@ function displayLeaderboard() {
     });
 }
 
-// Clear leaderboard
+// Clear leaderboard (Admin function - use with caution!)
 function clearLeaderboard() {
-    if (confirm('Are you sure you want to clear the leaderboard?')) {
-        gameState.leaderboard = [];
-        localStorage.removeItem('tomJerryLeaderboard');
-        displayLeaderboard();
+    if (confirm('Are you sure you want to clear the ENTIRE GLOBAL leaderboard? This will affect all players!')) {
+        if (confirm('This action cannot be undone. Are you absolutely sure?')) {
+            leaderboardRef.remove((error) => {
+                if (error) {
+                    console.error('Error clearing leaderboard:', error);
+                    alert('Failed to clear leaderboard.');
+                } else {
+                    gameState.leaderboard = [];
+                    displayLeaderboard();
+                    alert('Leaderboard cleared successfully!');
+                }
+            });
+        }
     }
 }
 
