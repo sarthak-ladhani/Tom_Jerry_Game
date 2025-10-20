@@ -3,13 +3,13 @@
 // Get these from: Firebase Console > Project Settings > Your apps > Firebase SDK snippet
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDEMO_KEY_REPLACE_WITH_YOUR_ACTUAL_KEY",
-    authDomain: "your-project-id.firebaseapp.com",
-    databaseURL: "https://your-project-id-default-rtdb.firebaseio.com",
-    projectId: "your-project-id",
-    storageBucket: "your-project-id.appspot.com",
-    messagingSenderId: "123456789012",
-    appId: "1:123456789012:web:abcdef1234567890"
+  apiKey: "AIzaSyCvIXChDeaXNVlCJhGW1NUxgtRUJvwNNQU",
+  authDomain: "tom-jerry-game.firebaseapp.com",
+  databaseURL: "https://tom-jerry-game-default-rtdb.firebaseio.com",
+  projectId: "tom-jerry-game",
+  storageBucket: "tom-jerry-game.firebasestorage.app",
+  messagingSenderId: "904909475059",
+  appId: "1:904909475059:web:899e9bf9ddaa8e00f97b86"
 };
 
 // Initialize Firebase
