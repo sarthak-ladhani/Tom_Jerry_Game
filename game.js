@@ -48,7 +48,6 @@ const leaderboardBtn = document.getElementById('leaderboardBtn');
 const leaderboardModal = document.getElementById('leaderboardModal');
 const closeLeaderboardBtn = document.getElementById('closeLeaderboardBtn');
 const leaderboardList = document.getElementById('leaderboardList');
-const clearLeaderboardBtn = document.getElementById('clearLeaderboardBtn');
 
 // Sound Effects (using Web Audio API)
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -393,24 +392,6 @@ function displayLeaderboard() {
 
         leaderboardList.appendChild(item);
     });
-}
-
-// Clear leaderboard (Admin function - use with caution!)
-function clearLeaderboard() {
-    if (confirm('Are you sure you want to clear the ENTIRE GLOBAL leaderboard? This will affect all players!')) {
-        if (confirm('This action cannot be undone. Are you absolutely sure?')) {
-            leaderboardRef.remove((error) => {
-                if (error) {
-                    console.error('Error clearing leaderboard:', error);
-                    alert('Failed to clear leaderboard.');
-                } else {
-                    gameState.leaderboard = [];
-                    displayLeaderboard();
-                    alert('Leaderboard cleared successfully!');
-                }
-            });
-        }
-    }
 }
 
 // Show leaderboard modal
@@ -791,7 +772,6 @@ playerNameInput.addEventListener('keypress', (e) => {
 // Leaderboard
 leaderboardBtn.addEventListener('click', showLeaderboard);
 closeLeaderboardBtn.addEventListener('click', hideLeaderboard);
-clearLeaderboardBtn.addEventListener('click', clearLeaderboard);
 
 // Close modals on background click
 nameModal.addEventListener('click', (e) => {
