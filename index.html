@@ -10,9 +10,14 @@
     <div class="game-container">
         <header>
             <h1>🐱 Tom & Jerry Whack-A-Mole 🐭</h1>
+            <button id="leaderboardBtn" class="btn-leaderboard">🏆 Leaderboard</button>
         </header>
 
         <div class="game-info">
+            <div class="info-box">
+                <span class="label">Player:</span>
+                <span id="playerName" class="value">-</span>
+            </div>
             <div class="info-box">
                 <span class="label">Score:</span>
                 <span id="score" class="value">0</span>
@@ -20,10 +25,6 @@
             <div class="info-box">
                 <span class="label">Time:</span>
                 <span id="timer" class="value">90</span>
-            </div>
-            <div class="info-box">
-                <span class="label">High Score:</span>
-                <span id="highScore" class="value">0</span>
             </div>
         </div>
 
@@ -45,6 +46,31 @@
                 <li>⏱️ You have 90 seconds to get the highest score</li>
                 <li>📈 Jerry gets faster as you progress!</li>
             </ul>
+        </div>
+    </div>
+
+    <!-- Name Input Modal -->
+    <div id="nameModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Enter Your Name</h2>
+            <input type="text" id="playerNameInput" placeholder="Your Name" maxlength="20" autocomplete="off">
+            <div class="modal-buttons">
+                <button id="submitNameBtn" class="btn btn-primary">Start Playing</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal hidden">
+        <div class="modal-content leaderboard-content">
+            <div class="modal-header">
+                <h2>🏆 Leaderboard</h2>
+                <button id="closeLeaderboardBtn" class="btn-close">✕</button>
+            </div>
+            <div id="leaderboardList" class="leaderboard-list">
+                <!-- Leaderboard will be populated by JavaScript -->
+            </div>
+            <button id="clearLeaderboardBtn" class="btn btn-secondary">Clear Leaderboard</button>
         </div>
     </div>
 

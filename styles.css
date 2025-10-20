@@ -34,12 +34,32 @@ body.playing {
 header {
     text-align: center;
     margin-bottom: 20px;
+    position: relative;
 }
 
 h1 {
     color: #333;
     font-size: 2.5rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.btn-leaderboard {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #333;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-leaderboard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
 }
 
 .game-info {
@@ -289,4 +309,218 @@ h1 {
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 2rem;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s ease;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-close:hover {
+    color: #333;
+}
+
+#playerNameInput {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2rem;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+#playerNameInput:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+/* Leaderboard Styles */
+.leaderboard-content {
+    max-width: 600px;
+}
+
+.leaderboard-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    transition: transform 0.2s ease;
+}
+
+.leaderboard-item:hover {
+    transform: translateX(5px);
+}
+
+.leaderboard-item.top-1 {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.leaderboard-item.top-2 {
+    background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
+    color: white;
+    font-weight: bold;
+}
+
+.leaderboard-item.top-3 {
+    background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
+    color: white;
+    font-weight: bold;
+}
+
+.leaderboard-rank {
+    font-size: 1.5rem;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: center;
+}
+
+.leaderboard-name {
+    flex: 1;
+    font-size: 1.2rem;
+    margin-left: 15px;
+}
+
+.leaderboard-score {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+.leaderboard-date {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-left: 15px;
+}
+
+.leaderboard-empty {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 1.2rem;
+}
+
+/* Mobile adjustments for modals */
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 25px;
+        width: 95%;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .leaderboard-item {
+        padding: 10px;
+    }
+
+    .leaderboard-rank {
+        min-width: 35px;
+        font-size: 1.2rem;
+    }
+
+    .leaderboard-name {
+        font-size: 1rem;
+        margin-left: 10px;
+    }
+
+    .leaderboard-score {
+        font-size: 1.1rem;
+        margin-left: 10px;
+    }
+
+    .leaderboard-date {
+        display: none;
+    }
 }

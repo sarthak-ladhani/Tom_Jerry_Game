@@ -26,6 +26,8 @@ const gameState = {
     timerIntervalId: null,
     hammerCursor: null,
     hitEffects: [], // Store active hit effects
+    playerName: '',
+    leaderboard: [],
 };
 
 // Canvas Setup
@@ -35,10 +37,18 @@ const ctx = canvas.getContext('2d');
 // UI Elements
 const scoreElement = document.getElementById('score');
 const timerElement = document.getElementById('timer');
-const highScoreElement = document.getElementById('highScore');
+const playerNameElement = document.getElementById('playerName');
 const startBtn = document.getElementById('startBtn');
 const restartBtn = document.getElementById('restartBtn');
 const gameMessage = document.getElementById('gameMessage');
+const nameModal = document.getElementById('nameModal');
+const playerNameInput = document.getElementById('playerNameInput');
+const submitNameBtn = document.getElementById('submitNameBtn');
+const leaderboardBtn = document.getElementById('leaderboardBtn');
+const leaderboardModal = document.getElementById('leaderboardModal');
+const closeLeaderboardBtn = document.getElementById('closeLeaderboardBtn');
+const leaderboardList = document.getElementById('leaderboardList');
+const clearLeaderboardBtn = document.getElementById('clearLeaderboardBtn');
 
 // Sound Effects (using Web Audio API)
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -276,26 +286,92 @@ function initHoles() {
     }
 }
 
-// Load high score from localStorage
-function loadHighScore() {
-    const saved = localStorage.getItem('tomJerryHighScore');
-    gameState.highScore = saved ? parseInt(saved) : 0;
-    highScoreElement.textContent = gameState.highScore;
+// Load leaderboard from localStorage
+function loadLeaderboard() {
+    const saved = localStorage.getItem('tomJerryLeaderboard');
+    gameState.leaderboard = saved ? JSON.parse(saved) : [];
 }
 
-// Save high score to localStorage
-function saveHighScore() {
-    if (gameState.score > gameState.highScore) {
-        gameState.highScore = gameState.score;
-        localStorage.setItem('tomJerryHighScore', gameState.highScore);
-        highScoreElement.textContent = gameState.highScore;
+// Save leaderboard to localStorage
+function saveLeaderboard() {
+    localStorage.setItem('tomJerryLeaderboard', JSON.stringify(gameState.leaderboard));
+}
+
+// Add score to leaderboard
+function addToLeaderboard(name, score) {
+    const entry = {
+        name: name,
+        score: score,
+        date: new Date().toLocaleDateString(),
+        timestamp: Date.now()
+    };
+
+    gameState.leaderboard.push(entry);
+
+    // Sort by score (descending) and keep only top 10
+    gameState.leaderboard.sort((a, b) => b.score - a.score);
+    gameState.leaderboard = gameState.leaderboard.slice(0, 10);
+
+    saveLeaderboard();
+}
+
+// Display leaderboard
+function displayLeaderboard() {
+    leaderboardList.innerHTML = '';
+
+    if (gameState.leaderboard.length === 0) {
+        leaderboardList.innerHTML = '<div class="leaderboard-empty">No scores yet. Be the first!</div>';
+        return;
     }
+
+    // Show top 5
+    const topFive = gameState.leaderboard.slice(0, 5);
+
+    topFive.forEach((entry, index) => {
+        const rank = index + 1;
+        const item = document.createElement('div');
+        item.className = `leaderboard-item ${rank <= 3 ? `top-${rank}` : ''}`;
+
+        const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+
+        item.innerHTML = `
+            <div class="leaderboard-rank">${rankEmoji}</div>
+            <div class="leaderboard-name">${entry.name}</div>
+            <div class="leaderboard-score">${entry.score} pts</div>
+            <div class="leaderboard-date">${entry.date}</div>
+        `;
+
+        leaderboardList.appendChild(item);
+    });
+}
+
+// Clear leaderboard
+function clearLeaderboard() {
+    if (confirm('Are you sure you want to clear the leaderboard?')) {
+        gameState.leaderboard = [];
+        localStorage.removeItem('tomJerryLeaderboard');
+        displayLeaderboard();
+    }
+}
+
+// Show leaderboard modal
+function showLeaderboard() {
+    displayLeaderboard();
+    leaderboardModal.classList.remove('hidden');
+}
+
+// Hide leaderboard modal
+function hideLeaderboard() {
+    leaderboardModal.classList.add('hidden');
 }
 
 // Update UI
 function updateUI() {
     scoreElement.textContent = gameState.score;
     timerElement.textContent = gameState.timeRemaining;
+    if (gameState.playerName) {
+        playerNameElement.textContent = gameState.playerName;
+    }
 }
 
 // Pop Jerry from random hole
@@ -524,8 +600,39 @@ function updateHammerPosition(event) {
     }
 }
 
-// Start game
-function startGame() {
+// Show name input modal
+function showNameInput() {
+    nameModal.classList.remove('hidden');
+    playerNameInput.value = '';
+    playerNameInput.focus();
+}
+
+// Hide name input modal
+function hideNameInput() {
+    nameModal.classList.add('hidden');
+}
+
+// Handle name submission
+function submitName() {
+    const name = playerNameInput.value.trim();
+
+    if (name.length === 0) {
+        alert('Please enter your name!');
+        return;
+    }
+
+    gameState.playerName = name;
+    hideNameInput();
+    actuallyStartGame();
+}
+
+// Request to start game (shows name input first)
+function requestStartGame() {
+    showNameInput();
+}
+
+// Actually start the game (after name is entered)
+function actuallyStartGame() {
     // Reset game state
     gameState.score = 0;
     gameState.timeRemaining = CONFIG.GAME_DURATION;
@@ -581,30 +688,65 @@ function endGame() {
         gameState.hammerCursor.style.display = 'none';
     }
 
-    // Save high score
-    saveHighScore();
+    // Add score to leaderboard
+    if (gameState.score > 0 && gameState.playerName) {
+        addToLeaderboard(gameState.playerName, gameState.score);
+    }
 
     // Play game over sound
     playGameOverSound();
 
+    // Check if player made it to top 5
+    const playerRank = gameState.leaderboard.findIndex(entry =>
+        entry.name === gameState.playerName && entry.score === gameState.score
+    ) + 1;
+
+    const madeTopFive = playerRank > 0 && playerRank <= 5;
+
     // Show game over message
-    const isNewHighScore = gameState.score === gameState.highScore && gameState.score > 0;
     gameMessage.innerHTML = `
-        <div>Game Over!</div>
+        <div>Game Over, ${gameState.playerName}!</div>
         <div style="font-size: 1.5rem; margin-top: 10px;">
             Final Score: ${gameState.score}
         </div>
-        ${isNewHighScore ? '<div style="font-size: 1.2rem; color: #FFD700; margin-top: 5px;">🎉 New High Score! 🎉</div>' : ''}
+        ${madeTopFive ? `<div style="font-size: 1.2rem; color: #FFD700; margin-top: 5px;">🎉 Rank #${playerRank} on Leaderboard! 🎉</div>` : ''}
     `;
     gameMessage.classList.remove('hidden');
     restartBtn.classList.remove('hidden');
 }
 
 // Event listeners
-startBtn.addEventListener('click', startGame);
-restartBtn.addEventListener('click', startGame);
+startBtn.addEventListener('click', requestStartGame);
+restartBtn.addEventListener('click', requestStartGame);
 canvas.addEventListener('click', handleCanvasClick);
 canvas.addEventListener('touchstart', handleCanvasClick);
+
+// Name input
+submitNameBtn.addEventListener('click', submitName);
+playerNameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        submitName();
+    }
+});
+
+// Leaderboard
+leaderboardBtn.addEventListener('click', showLeaderboard);
+closeLeaderboardBtn.addEventListener('click', hideLeaderboard);
+clearLeaderboardBtn.addEventListener('click', clearLeaderboard);
+
+// Close modals on background click
+nameModal.addEventListener('click', (e) => {
+    if (e.target === nameModal) {
+        // Don't allow closing name modal by clicking background
+        // Player must enter a name
+    }
+});
+
+leaderboardModal.addEventListener('click', (e) => {
+    if (e.target === leaderboardModal) {
+        hideLeaderboard();
+    }
+});
 
 // Track hammer cursor position
 document.addEventListener('mousemove', updateHammerPosition);
@@ -613,7 +755,7 @@ document.addEventListener('touchmove', updateHammerPosition, { passive: false })
 // Initialize game
 function init() {
     initHoles();
-    loadHighScore();
+    loadLeaderboard();
     createHammerCursor();
 
     // Draw initial state
