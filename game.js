@@ -440,9 +440,28 @@ function popJerry() {
 function handleCanvasClick(event) {
     if (!gameState.isPlaying) return;
 
-    // Support both mouse and touch events
-    const clientX = event.clientX || (event.touches && event.touches[0].clientX);
-    const clientY = event.clientY || (event.touches && event.touches[0].clientY);
+    // Prevent default touch behavior to ensure accurate coordinates
+    if (event.touches) {
+        event.preventDefault();
+    }
+
+    // Support both mouse and touch events - get the touch/click coordinates
+    let clientX, clientY;
+    if (event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else if (event.clientX !== undefined) {
+        clientX = event.clientX;
+        clientY = event.clientY;
+    } else {
+        return; // No valid coordinates
+    }
+
+    // Update hammer position immediately to sync with hit detection
+    if (gameState.hammerCursor) {
+        gameState.hammerCursor.style.left = clientX + 'px';
+        gameState.hammerCursor.style.top = clientY + 'px';
+    }
 
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -630,8 +649,14 @@ function createHammerCursor() {
 function updateHammerPosition(event) {
     if (!gameState.hammerCursor || !gameState.isPlaying) return;
 
-    const clientX = event.clientX || (event.touches && event.touches[0].clientX);
-    const clientY = event.clientY || (event.touches && event.touches[0].clientY);
+    let clientX, clientY;
+    if (event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+    } else if (event.clientX !== undefined) {
+        clientX = event.clientX;
+        clientY = event.clientY;
+    }
 
     if (clientX !== undefined && clientY !== undefined) {
         gameState.hammerCursor.style.display = 'block';

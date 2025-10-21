@@ -1024,4 +1024,4 @@ For questions or issues with this specification:
 
 **Last Updated:** December 2024
 **Version:** 4.0
-**Author:** Claude Code (AI Assistant)
+**Author:** Sarthak Ladhani
