@@ -190,7 +190,7 @@ CONFIG = {
 
 **Hammer Cursor:**
 - Desktop: 64×64px hammer emoji in cursor
-- Mobile: Visible 80×80px hammer element that follows touch/mouse
+- Mobile: Visible 60×60px hammer element that follows touch/mouse
 - Hit animation: Rotate -30deg and scale 1.3× on click
 
 ### 5.6 Responsive Breakpoints
@@ -340,7 +340,7 @@ leaderboard/
 - Prevent default touch behaviors: `touch-action: none`
 
 **Visible Hammer Cursor:**
-- 80×80px hammer emoji element
+- 60×60px hammer emoji element (reduced from 80px for better precision)
 - Fixed position, follows touch/mouse
 - `pointer-events: none` (doesn't block clicks)
 - z-index: 1000 (always on top)
@@ -1007,6 +1007,13 @@ See `FIREBASE_SETUP.md` for complete instructions:
 - Automatic cleanup
 - Remove clear leaderboard option
 
+### Version 4.1 (Mobile Precision Update)
+- Reduced mobile hammer cursor from 80×80px to 60×60px
+- Improved touch coordinate extraction for precise hit detection
+- Fixed coordinate drift issue causing hits to register left of tap
+- Added preventDefault() for touch events
+- Better synchronization between hammer cursor and hit detection
+
 ---
 
 ## 18. Contact & Support
@@ -1023,5 +1030,5 @@ For questions or issues with this specification:
 *This document provides complete specifications to recreate the Tom & Jerry Whack-A-Mole game from scratch. All technical details, design specifications, and implementation guidelines are included.*
 
 **Last Updated:** December 2024
-**Version:** 4.0
+**Version:** 4.1
 **Author:** Sarthak Ladhani
